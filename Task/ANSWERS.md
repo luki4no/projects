@@ -19,7 +19,6 @@
 
 - [Summary](#Summary)
 
-
 # General Linux Tasks
 
 ## 1. Provide Systematic Access for Other Users to the Machine
@@ -193,7 +192,7 @@ cgexec -g memory,cpu:devgroup /opt/myapp
 
 **Tool: NGINX (recommended for performance + flexibility)**
 
-**Config:**
+**Bare-Metal or Host-Based Config:**
 ```nginx
 server {
     listen 443 ssl;
@@ -216,6 +215,56 @@ server {
     error_log /var/log/nginx/error.log;
 }
 ```
+
+**Alternative: Docker-Based Implementation**
+
+*Advantages: Easier portability, encapsulated config, fast redeployment.*
+
+**Dockerfile (for NGINX reverse proxy)**
+```dockerfile
+FROM nginx:alpine
+COPY default.conf /etc/nginx/conf.d/default.conf
+```
+
+**default.conf**
+```nginx
+server {
+    listen 443 ssl;
+    server_name app.example.com;
+
+    ssl_certificate /etc/nginx/certs/fullchain.pem;
+    ssl_certificate_key /etc/nginx/certs/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    location / {
+        proxy_pass http://backend:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+**docker-compose.yml**
+```yaml
+version: '3'
+services:
+  reverse-proxy:
+    build: .
+    ports:
+      - "443:443"
+    volumes:
+      - ./certs:/etc/nginx/certs:ro
+
+  backend:
+    image: my-backend-app:latest
+    expose:
+      - "8080"
+```
+
+This setup ensures a clean separation of proxy logic, can be easily deployed on any host, and fits well in containerized or hybrid environments.
 
 ---
 
@@ -295,7 +344,6 @@ server {
 - **Initial Setup**: 2–3 weeks
 - **Ongoing Maintenance**: ~5 hrs/month
 - **Licensing**: Prefer open-source (pfSense, WireGuard, NGINX), optional RADIUS or SSO integration
-
 
 # Summary
 
