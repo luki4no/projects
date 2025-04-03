@@ -14,7 +14,6 @@
 - [4. Provide a Proxy to a Webserver Claiming Port 443](#4-provide-a-proxy-to-a-webserver-claiming-port-443)
 
 **Summary**
-
 - [Summary](#Summary)
 
 # General Linux Tasks
@@ -300,7 +299,7 @@ This setup ensures a clean separation of proxy logic, can be easily deployed on 
 ```
 
 ### Network Hardware
-Two alternative setups are proposed based on budget considerations:
+Three alternative setups are proposed based on budget and performance considerations:
 
 **🟢 Cost-Effective Setup (Budget-Conscious)**
 - **Firewall:** pfSense on a low-power appliance or virtual machine (e.g., Protectli Vault, used Dell OptiPlex with dual NICs)
@@ -312,7 +311,12 @@ Two alternative setups are proposed based on budget considerations:
 - **Switch:** UniFi Switch Pro 24 or Aruba 2930F (fully managed L3 switch)
 - **Access Points:** Aruba InstantOn AP22 or UniFi U6-Pro (Wi-Fi 6, enterprise-grade)
 
-Both setups offer VLAN support, centralized management, and compatibility with open-source firewall platforms.
+**🟣 High-End Enterprise Setup (Scalability & Compliance Focus)**
+- **Firewall:** Palo Alto PA-440 or Fortinet FortiGate 60F with unified threat management (UTM)
+- **Switch:** Cisco Catalyst 9300 or Aruba CX 6200 (full L3 with advanced QoS and telemetry)
+- **Access Points:** Cisco Meraki MR46 or Aruba AP-635 (Wi-Fi 6/6E, with cloud-managed control)
+
+All setups support VLAN segmentation and offer scalable security layers, with the high-end solution ideal for regulated or highly secure environments.
 
 ### Security Measures
 - Firewall ACLs + stateful rules to restrict VLAN traffic
