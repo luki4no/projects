@@ -84,6 +84,10 @@
 - Use group-based permissions.
 - Use `chroot` jails or `AppArmor`/`SELinux` for stricter isolation if necessary.
 
+**What are AppArmor and SELinux?**
+- **AppArmor** (Application Armor) is a Linux security module that uses profiles to restrict the capabilities of programs. It operates on a per-application basis and is relatively simple to configure.
+- **SELinux** (Security-Enhanced Linux) is a more advanced and granular security module that uses mandatory access controls (MAC) to enforce policies on all processes, users, and files. It is powerful but has a steeper learning curve and is common in Red Hat-based systems.
+
 **Implementation:**
 
 **A. chroot Jail (Basic Example for `alice`)**
