@@ -267,247 +267,78 @@ This setup ensures a clean separation of proxy logic, can be easily deployed on 
 
 # Network Task
 
-## Company Topology Design
+## Network Architectures
 
-### Architectures
+### North–South Traffic Architectures
+These architectures are optimized for traffic between end-users and data centers, or from the edge to the core (north–south direction).
 
-**Collapsed-core architecture vs Three-Tier architecture**
+#### Collapsed-Core Architecture
+A simplified alternative to the traditional three-tier design, combining the core and distribution layers into one. It reduces cost and complexity, making it ideal for small to medium-sized networks.
 
-Collapsed-core architecture is essentially a simplified alternative to the traditional Three-Tier architecture in networking.
+#### Three-Tier Architecture
+A hierarchical design separating the core, distribution, and access layers. It offers better modularity, scalability, and fault tolerance, and is suited for large enterprise networks with significant north–south traffic.
 
-### Quick comparison:
+### East–West Traffic Architecture
+These architectures are optimized for server-to-server or intra–data center traffic, i.e., east–west traffic.
 
-#### ✅ **Three-Tier Architecture**
-1. **Core Layer** – High-speed backbone connecting distribution layers.
-2. **Distribution Layer** – Aggregates access layer switches; handles routing, policy, filtering.
-3. **Access Layer** – Connects end devices like PCs, printers, APs.
+#### Spine-Leaf Architecture
+A modern data center topology where every leaf switch connects to every spine switch, providing consistent low latency and high bandwidth. It’s ideal for environments with heavy east–west traffic and high scalability demands.
 
-- **Used in:** Large enterprise networks
-- **Pros:** Scalable, modular, fault-tolerant
-- **Cons:** More complex, more hardware
+## Recommended Architecture: Collapsed-Core with DMZ + VLAN Segmentation
 
-#### ✅ **Collapsed-Core Architecture**
-- **Combines the Core and Distribution layers** into one layer.
-- You’re left with:
-  1. **Collapsed Core/Distribution Layer**
-  2. **Access Layer**
+🔹 **Why Collapsed-Core?**
+Threedy is a mid-sized company (100 employees), so a full Three-Tier architecture would be overkill—too complex and costly.
 
-- **Used in:** Small to medium-sized networks
-- **Pros:** Lower cost, simpler management, fewer devices
-- **Cons:** Less redundancy/scalability than Three-Tier
+Collapsed-Core gives you simplicity (combined core/distribution), while still supporting advanced segmentation and security needs.
 
----
+Easily supports multiple VLANs, routing between zones, firewall integration, and VPN termination.
 
-### When to use each?
+### 🔸 Network Zones (VLANs)
+Each group will be isolated into a VLAN for segmentation and security:
 
-| Network Size | Architecture       | Why                         |
-|--------------|-------------------|-----------------------------|
-| Small/Medium | Collapsed-Core    | Cost-effective & simple     |
-| Large        | Three-Tier        | Scalability & performance   |
+| Zone         | VLAN ID | Purpose                        |
+|--------------|---------|--------------------------------|
+| Developers   | 10      | Internal dev tools, Git, etc   |
+| Management   | 20      | Exec communications, reports   |
+| Sales        | 30      | CRM, emails, VoIP, etc         |
+| HR           | 40      | Employee data, payroll         |
+| DMZ          | 50      | External-facing services       |
+| VPN Clients  | 60      | Remote access per zone         |
 
-### Assumptions
-- Company Size: ~100 employees
-- Roles: Developers, Management, Sales, HR
-- Network Zones: Dev, Mgmt, Sales, HR, DMZ
-- Single external static IP address
+### 🧱 Critical Components (L3-capable hardware suggested)
+- **L3 Core/Distribution Switch** (e.g., Cisco Catalyst 9300 or equivalent)
+- **Firewall** (e.g., pfSense, Fortinet, Cisco ASA)
+- **Router / NAT Gateway**
+- **Access Layer Switches** (L2 switches with 802.1Q VLAN support)
+- **VPN Server** (can be part of firewall or separate OpenVPN/WireGuard box)
+- **WAPs** (with VLAN tagging support for wireless access per zone)
 
-### Topology Overview (Text-Based Markdown Format)
+### 🌐 DMZ Handling with a Single Public IP
+Since you only have one external IP, here’s how to expose multiple services:
 
-#### Option 1: Three-Tiered Network Hierarchy
-```markdown
-                                     +-------------------+
-                                     |     Internet      |
-                                     +--------+----------+
-                                              |
-                    +-------------------------+-------------------------+
-                    |        WAN Routers / Firewalls (2x)               |
-                    +-----------+-------------------------+-------------+
-                                |                         |
-              +-----------------+-----------+    +--------+--------------------+
-              |       Core L3 Switch A      |    |       Core L3 Switch B      |
-              +----------------+------------+    +---------+-------------------+
-                               |                           |
-              +----------------+------------+    +---------+-------------------+
-              |   Distribution Switch A     |    |   Distribution Switch B     |
-              +--------+--------+-----------+    +----+--------+--------+------+
-                       |        |                     |        |        |
-                   +--+--+   +--+--+                +-----+   +-----+  +-----+
-                   | SW1 |   | SW2 |                | SW3 |   | SW4 |  | SW5 |
-                   +--+--+   +--+--+                +--+--+   +--+--+  +--+--+
-                      |         |                      |         |        |
-                     Dev      Mgmt                   Sales       HR     DMZ/Wi-Fi
-```
+- Use **port forwarding** or **reverse proxying** from a DMZ gateway/firewall.
+- Example tools:
+  - HAProxy, NGINX, or Apache reverse proxy for HTTP/S
+  - Firewall rules for custom ports (e.g., SSH, VPN)
+- Place only the **minimal exposed services** in the DMZ (e.g., a web frontend, not the DB)
 
-#### Option 2: Collapsed-Core Architecture
-```markdown
-                            +-------------------+
-                            |     Internet      |
-                            +--------+----------+
-                                     |
-                     +---------------+-----------------+
-                     |  Firewall / VPN Gateway (HA)    |
-                     +--------+-------------+----------+
-                              |             |
-                     +--------+----+   +----+----------+
-                     | L3 Switch A |   |  L3 Switch B  |
-                     +---+-----+---+   +---+-----+-----+
-                         |     |           |     |
-                      +----+ +----+     +----+ +----+ 
-                      | AP | | SW |     | SW | | AP |
-                      +----+ +----+     +----+ +----+ 
-                         |      |           |     |
-                       WiFi    Dev        Sales  HR/DMZ
-```
+### 🔐 VPN Access (Per-Zone)
+- Users connect via VPN (OpenVPN / WireGuard)
+- After authentication, they are placed into their VLAN (via VPN policies or RADIUS)
+- Access is restricted to their zone using firewall rules or ACLs
 
-- Use Three-Tier for enterprise scalability, high performance, and full fault-tolerance
-- Use Collapsed-Core for cost-efficiency and simpler setup suitable for ~100-user companies
-- Both approaches support VLAN segmentation, secure VPN access, and DMZ exposure via a single public IP
+### 🧠 Summary
 
+| Feature         | Implementation                            |
+|----------------|--------------------------------------------|
+| Architecture    | Collapsed-Core                             |
+| Segmentation    | VLANs for each dept. + DMZ                 |
+| Internet access | NAT via firewall/router                    |
+| DMZ with 1 IP   | Port-forwarding + reverse proxy            |
+| VPN             | VLAN-aware + per-zone access               |
+| Security        | Inter-VLAN ACLs + centralized firewall     |
+| Scalability     | Simple, with room for modular growth       |
 
-- Collapsed Core: Core and Distribution layers are combined for simplicity and cost-efficiency
-- Dual L3 switches ensure redundancy and inter-VLAN routing
-- Access switches and APs connect each department (Dev, Sales, HR, etc.)
-- VLANs per department; tagged traffic handled at L3 switch level
-- All zones access internet via central firewall/VPN gateway
-- DMZ hosts only selected public services, reverse-proxied via single public IP
-- VPN profiles grant segmented access per user role or zone
-```
-
-- Fully redundant WAN/firewall, core, and distribution layers
-- Access switches connect to workstations and Wi-Fi APs in respective zones
-- VLANs per zone: Dev, Mgmt, Sales, HR, DMZ, and Wi-Fi
-- Distribution switches handle inter-VLAN routing, traffic control, and QoS
-- Core layer aggregates traffic and connects to the firewall layer
-- Firewall manages NAT, ACLs, VPNs, and exposes DMZ with reverse proxy
-- A single public IP serves all external services via reverse proxy (e.g., NGINX)
-- VPN endpoint enables secure, segmented access per group
-```
-
-- Fully redundant WAN/firewall, core, and distribution layers
-- Access switches connect to workstations and Wi-Fi APs in respective zones
-- VLANs per zone: Dev, Mgmt, Sales, HR, DMZ, and Wi-Fi
-- Distribution switches handle inter-VLAN routing, traffic control, and QoS
-- Core layer aggregates traffic and connects to the firewall layer
-- Firewall manages NAT, ACLs, VPNs, and exposes DMZ with reverse proxy
-- A single public IP serves all external services via reverse proxy (e.g., NGINX)
-- VPN endpoint enables secure, segmented access per group
-```
-
-- Redundant firewalls ensure high availability.
-- Dual Core and Distribution layers provide fault tolerance.
-- Access switches connect workstations and APs for each department.
-- Each VLAN connects to its distribution switch and is tagged accordingly.
-- DMZ hosts externally reachable services behind a reverse proxy.
-- Single external IP maps to multiple services internally.
-- VPN terminates at firewall, providing segmented access to each VLAN.
-```
-
-### Network Hardware
-Three alternative setups are proposed based on budget and performance considerations:
-
-**🟢 Cost-Effective Setup (Budget-Conscious)**
-- **Firewall:** pfSense on a low-power appliance or virtual machine (e.g., Protectli Vault, used Dell OptiPlex with dual NICs)
-- **Switch:** TP-Link JetStream TL-SG3210XHP-M2 or Netgear GS110EMX (L2+/L3-lite with VLAN support)
-- **Access Points:** TP-Link Omada EAP245 or Ubiquiti UniFi U6-Lite (affordable, VLAN-capable)
-
-**🔵 Higher-End Setup (Performance & Reliability Focus)**
-- **Firewall:** OPNsense running on Netgate 6100 or similar business-class appliance
-- **Switch:** UniFi Switch Pro 24 or Aruba 2930F (fully managed L3 switch)
-- **Access Points:** Aruba InstantOn AP22 or UniFi U6-Pro (Wi-Fi 6, enterprise-grade)
-
-**🟣 High-End Enterprise Setup (Scalability & Compliance Focus)**
-- **Firewall:** Palo Alto PA-440 or Fortinet FortiGate 60F with unified threat management (UTM)
-- **Switch:** Cisco Catalyst 9300 or Aruba CX 6200 (full L3 with advanced QoS and telemetry)
-- **Access Points:** Cisco Meraki MR46 or Aruba AP-635 (Wi-Fi 6/6E, with cloud-managed control)
-
-All setups support VLAN segmentation and offer scalable security layers, with the high-end solution ideal for regulated or highly secure environments.
-
-### Security Measures
-- Firewall ACLs + stateful rules to restrict VLAN traffic
-- DMZ isolated with access to necessary services only (e.g., web apps)
-- HTTPS with valid certificates
-- IPS/IDS like Suricata or Snort on pfSense
-- MFA for VPN and admin interfaces
-- Central log collection with Graylog/ELK
-
-### External IP Handling
-- Use reverse proxy (NGINX/HAProxy) on DMZ host to route traffic based on hostname
-- Example:
-```nginx
-server {
-    listen 443 ssl;
-    server_name dev.threedy.io;
-    proxy_pass http://192.168.50.10;
-}
-```
-
-### VPN Access
-- Per-group OpenVPN/WireGuard profiles via pfSense or standalone VPN server
-- Access restricted to specific VLAN based on user role
-
-### Cost and Time Estimate
-
-**🟢 Cost-Effective Setup**
-- **Hardware**: ~€1,000–€1,300 total
-- **Initial Setup**: 1–2 weeks
-- **Ongoing Maintenance**: ~5 hrs/month
-
-**🔵 Higher-End Setup**
-- **Hardware**: ~€2,000–€2,500 total
-- **Initial Setup**: 2–3 weeks
-- **Ongoing Maintenance**: ~5 hrs/month
-
-**🟣 High-End Enterprise Setup**
-- **Hardware**: ~€6,000–€8,000 total
-- **Initial Setup**: 3–4 weeks
-- **Ongoing Maintenance**: ~8–10 hrs/month
-
-**Licensing**: Prefer open-source stack (pfSense, WireGuard, NGINX). High-end may require commercial licenses (e.g., Cisco, Palo Alto, Meraki). Optional RADIUS or SSO integration for all tiers.
-
-# Summary
-
-## 📝 Summary of Key Discussion Points
-
-### 🔐 User Management & Access Control
-- Created user accounts with SSH key-based login (`adduser`, `.ssh/authorized_keys`)
-- Used **Ansible playbook** for automated user provisioning
-- Applied **group-based sudo** and file access control
-- Introduced optional use of **LDAP/FreeIPA** for scalable identity management
-
-### 🛡️ Application/Folders Access Limitation
-- Group permissions + RBAC (`groupadd`, `chmod`, `chown`)
-- Explained **chroot jail** setup for shell isolation
-- Demonstrated **AppArmor** and **SELinux** usage
-  - Defined both
-  - Showed example profile application (e.g., restricting `vim` or `httpd`)
-- Mentioned `rbash` to limit user command access
-
-### ⚙️ Resource Isolation (Multi-user Workload)
-- **Systemd resource control** (`CPUQuota`, `MemoryMax`)
-- **cgroups** for CPU/memory limits per workload/user
-- Ensures one user/app doesn't starve system resources
-
-### 🌐 Proxy Server Setup
-- NGINX reverse proxy config on **port 443** with TLS
-- Optimized for **security** (`ssl_ciphers`, `protocols`) and **performance**
-- Used proxy headers to retain client info
-
-### 🕸️ Network Architecture Design
-- Designed **scalable network** for 100-employee org
-- VLANs: Dev, Mgmt, Sales, HR, DMZ (via L3 switch)
-- pfSense/OPNsense firewall with **VPN** per zone
-- DMZ serves select services using single public IP with reverse proxy
-
-### 🧱 Security Architecture
-- Firewall ACLs, IDS/IPS (Suricata), strict VLAN routing
-- HTTPS enforcement and **MFA for VPN**
-- Centralized logging (Graylog/ELK), future-ready
-
-### 💸 Time & Budget Estimate
-- Hardware cost: ~€10K
-- Initial setup: 2–3 weeks
-- Monthly maintenance: ~5 hours
-- Preference for **open-source solutions** (license savings)
 
 
 
