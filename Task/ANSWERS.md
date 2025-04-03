@@ -334,8 +334,8 @@ Collapsed-core architecture is essentially a simplified alternative to the tradi
                    +--+--+   +--+--+                +-----+   +-----+  +-----+
                    | SW1 |   | SW2 |                | SW3 |   | SW4 |  | SW5 |
                    +--+--+   +--+--+                +--+--+   +--+--+  +--+--+
-                     |          |                      |         |        |
-                    Dev       Mgmt                   Sales       HR     DMZ/Wi-Fi
+                      |         |                      |         |        |
+                     Dev      Mgmt                   Sales       HR     DMZ/Wi-Fi
 ```
 
 #### Option 2: Collapsed-Core Architecture
@@ -356,7 +356,7 @@ Collapsed-core architecture is essentially a simplified alternative to the tradi
                       | AP | | SW |     | SW | | AP |
                       +----+ +----+     +----+ +----+ 
                          |      |           |     |
-                         WiFi   Dev        Sales  HR/DMZ
+                       WiFi    Dev        Sales  HR/DMZ
 ```
 
 - Use Three-Tier for enterprise scalability, high performance, and full fault-tolerance
