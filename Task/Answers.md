@@ -284,4 +284,55 @@ server {
 
 ---
 
+# Summary
 
+---
+
+## 📝 Summary of Key Discussion Points
+
+### 🔐 User Management & Access Control
+- Created user accounts with SSH key-based login (`adduser`, `.ssh/authorized_keys`)
+- Used **Ansible playbook** for automated user provisioning
+- Applied **group-based sudo** and file access control
+- Introduced optional use of **LDAP/FreeIPA** for scalable identity management
+
+### 🛡️ Application/Folders Access Limitation
+- Group permissions + RBAC (`groupadd`, `chmod`, `chown`)
+- Explained **chroot jail** setup for shell isolation
+- Demonstrated **AppArmor** and **SELinux** usage
+  - Defined both
+  - Showed example profile application (e.g., restricting `vim` or `httpd`)
+- Mentioned `rbash` to limit user command access
+
+### ⚙️ Resource Isolation (Multi-user Workload)
+- **Systemd resource control** (`CPUQuota`, `MemoryMax`)
+- **cgroups** for CPU/memory limits per workload/user
+- Ensures one user/app doesn't starve system resources
+
+### 🌐 Proxy Server Setup
+- NGINX reverse proxy config on **port 443** with TLS
+- Optimized for **security** (`ssl_ciphers`, `protocols`) and **performance**
+- Used proxy headers to retain client info
+
+---
+
+### 🕸️ Network Architecture Design
+- Designed **scalable network** for 100-employee org
+- VLANs: Dev, Mgmt, Sales, HR, DMZ (via L3 switch)
+- pfSense/OPNsense firewall with **VPN** per zone
+- DMZ serves select services using single public IP with reverse proxy
+
+### 🧱 Security Architecture
+- Firewall ACLs, IDS/IPS (Suricata), strict VLAN routing
+- HTTPS enforcement and **MFA for VPN**
+- Centralized logging (Graylog/ELK), future-ready
+
+### 💸 Time & Budget Estimate
+- Hardware cost: ~€10K
+- Initial setup: 2–3 weeks
+- Monthly maintenance: ~5 hours
+- Preference for **open-source solutions** (license savings)
+
+---
+
+Would you like me to append this summary directly into the markdown document as well?
