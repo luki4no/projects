@@ -264,19 +264,19 @@ This setup ensures a clean separation of proxy logic, can be easily deployed on 
 
 ### Network Architectures
 
-### North–South Traffic Architectures
+I. **North–South Traffic Architectures**
 These architectures are optimized for traffic between end-users and data centers, or from the edge to the core (north–south direction).
 
-#### Collapsed-Core Architecture
+1. **Collapsed-Core Architecture**
 A simplified alternative to the traditional three-tier design, combining the core and distribution layers into one. It reduces cost and complexity, making it ideal for small to medium-sized networks.
 
-#### Three-Tier Architecture
+2. **Three-Tier Architecture**
 A hierarchical design separating the core, distribution, and access layers. It offers better modularity, scalability, and fault tolerance, and is suited for large enterprise networks with significant north–south traffic.
 
-### East–West Traffic Architecture
+II. **East–West Traffic Architecture**
 These architectures are optimized for server-to-server or intra–data center traffic, i.e., east–west traffic.
 
-#### Spine-Leaf Architecture
+1. **Spine-Leaf Architecture**
 A modern data center topology where every leaf switch connects to every spine switch, providing consistent low latency and high bandwidth. It’s ideal for environments with heavy east–west traffic and high scalability demands.
 
 ## Recommended Architecture: Collapsed-Core with DMZ + VLAN Segmentation
