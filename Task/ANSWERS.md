@@ -15,11 +15,6 @@
 - [4. Provide a Proxy to a Webserver Claiming Port 443](#4-provide-a-proxy-to-a-webserver-claiming-port-443)
 - [Network Task - Company Topology Design](#network-task---company-topology-design)
 
-**Summary**
-
-- [Summary](#Summary)
-
-
 # General Linux Tasks
 
 ## 1. Provide Systematic Access for Other Users to the Machine
@@ -253,9 +248,19 @@ server {
 ```
 
 ### Network Hardware
-- L3 Managed Switch (e.g., UniFi Switch Pro or Aruba 2930)
-- Firewall (pfSense/OPNsense appliance)
-- Access Points with VLAN support (UniFi or Aruba InstantOn)
+Two alternative setups are proposed based on budget considerations:
+
+**🟢 Cost-Effective Setup (Budget-Conscious)**
+- **Firewall:** pfSense on a low-power appliance or virtual machine (e.g., Protectli Vault, used Dell OptiPlex with dual NICs)
+- **Switch:** TP-Link JetStream TL-SG3210XHP-M2 or Netgear GS110EMX (L2+/L3-lite with VLAN support)
+- **Access Points:** TP-Link Omada EAP245 or Ubiquiti UniFi U6-Lite (affordable, VLAN-capable)
+
+**🔵 Higher-End Setup (Performance & Reliability Focus)**
+- **Firewall:** OPNsense running on Netgate 6100 or similar business-class appliance
+- **Switch:** UniFi Switch Pro 24 or Aruba 2930F (fully managed L3 switch)
+- **Access Points:** Aruba InstantOn AP22 or UniFi U6-Pro (Wi-Fi 6, enterprise-grade)
+
+Both setups offer VLAN support, centralized management, and compatibility with open-source firewall platforms.
 
 ### Security Measures
 - Firewall ACLs + stateful rules to restrict VLAN traffic
@@ -286,6 +291,7 @@ server {
 - **Ongoing Maintenance**: ~5 hrs/month
 - **Licensing**: Prefer open-source (pfSense, WireGuard, NGINX), optional RADIUS or SSO integration
 ```
+
 ```
 # Summary
 
