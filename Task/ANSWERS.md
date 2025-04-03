@@ -13,9 +13,6 @@
 - [3. Prevent Application Starvation Between Users](#3-prevent-application-starvation-between-users)
 - [4. Provide a Proxy to a Webserver Claiming Port 443](#4-provide-a-proxy-to-a-webserver-claiming-port-443)
 
-**Summary**
-- [Summary](#Summary)
-
 # General Linux Tasks
 
 ## 1. Provide Systematic Access for Other Users to the Machine
@@ -338,7 +335,4 @@ Since you only have one external IP, here’s how to expose multiple services:
 | VPN             | VLAN-aware + per-zone access               |
 | Security        | Inter-VLAN ACLs + centralized firewall     |
 | Scalability     | Simple, with room for modular growth       |
-
-
-
 
