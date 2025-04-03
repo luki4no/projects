@@ -12,7 +12,6 @@
 - [2. Limit Access of Users to Specific Applications/Folders](#2-limit-access-of-users-to-specific-applicationsfolders)
 - [3. Prevent Application Starvation Between Users](#3-prevent-application-starvation-between-users)
 - [4. Provide a Proxy to a Webserver Claiming Port 443](#4-provide-a-proxy-to-a-webserver-claiming-port-443)
-- [Network Task - Company Topology Design](#network-task---company-topology-design)
 
 **Summary**
 
