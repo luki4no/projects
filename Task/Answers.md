@@ -3,7 +3,7 @@
 **General Linux Tasks**
 - [1. Provide Systematic Access for Other Users to the Machine](#1-provide-systematic-access-for-other-users-to-the-machine)
 - [2. Limit Access of Users to Specific Applications/Folders](#2-limit-access-of-users-to-specific-applicationsfolders)
-- [3. Prevent Application Starvation Between Users](#3-prevent-application-starvation-between-users)
+- [3. Multiple Users Plan to Deploy Workloads on This Machine](#3-multiple-users-plan-to-deploy-workloads-on-this-machine)
 - [4. Provide a Proxy to a Webserver Claiming Port 443](#4-provide-a-proxy-to-a-webserver-claiming-port-443)
 
 **Network Task**
@@ -164,7 +164,7 @@ sudo ln -s /bin/bash /bin/rbash
 usermod -s /bin/rbash alice
 ```
 
-## 3. Prevent Application Starvation Between Users
+## 3. Multiple Users Plan to Deploy Workloads on This Machine
 
 **Approach 1: Systemd Resource Control**
 ```bash
@@ -283,4 +283,5 @@ server {
 ```
 
 ---
+
 
