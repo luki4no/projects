@@ -334,3 +334,69 @@ Since you only have one external IP, here’s how to expose multiple services:
 | Security        | Inter-VLAN ACLs + centralized firewall     |
 | Scalability     | Simple, with room for modular growth       |
 
+
+
+
+# NAT and Reverse Proxy
+
+---
+
+## 🔐 DMZ Exposure with Single Public IP (NAT + Reverse Proxy)
+
+Since we only have **one external IP address**, exposing multiple services in the DMZ requires combining:
+
+- **Reverse Proxy in the DMZ** (e.g., Nginx, HAProxy, Traefik):
+  - Routes HTTPS traffic based on **domain name (SNI/Host header)**
+  - Example:
+    - `vpn.threedy.com` → VPN gateway
+    - `app.threedy.com` → Internal web app
+    - `monitor.threedy.com` → Monitoring dashboard
+- **Firewall Port Forwarding (DNAT)**:
+  - For non-HTTP services (e.g., VPN on port 1194/UDP)
+  - Maps external ports to internal DMZ services
+
+This combination allows exposing selected services **securely and flexibly** using only one public IP.
+
+---
+
+## 🧱 Internal Network Segmentation with VLANs
+
+The internal network is segmented using **VLANs**, with each department assigned a dedicated VLAN and subnet:
+
+- VLANs are configured on a **managed switch** connected to the firewall’s **LAN interface (trunked)**.
+- The **firewall handles inter-VLAN routing and access control**.
+- This enables **strict isolation between departments** while preserving internet and VPN access.
+
+### 🔧 VLAN Example
+
+| VLAN | Department  | Subnet            |
+|------|-------------|-------------------|
+| 10   | Developers  | 192.168.10.0/24   |
+| 20   | Management  | 192.168.20.0/24   |
+| 30   | Sales       | 192.168.30.0/24   |
+| 40   | HR          | 192.168.40.0/24   |
+| 50   | DMZ         | 192.168.50.0/24   |
+| 99   | VPN Clients | 192.168.99.0/24   |
+
+---
+
+## 🖧 Network Topology Diagram
+
+```
+[Internet]
+    |
+[Firewall WAN]
+    |
+[Firewall]
+  |       \
+  |        [DMZ Interface] → [DMZ Hosts / Reverse Proxy]
+  |
+[LAN Interface] → [Managed Switch with VLANs]
+                        |
+    ┌────────┬─────────────┬───────────┐
+    |        |             |           |
+[VLAN 10] [VLAN 20]     [VLAN 30]   [VLAN 40]
+ Dev     Management     Sales         HR
+
+```
+
