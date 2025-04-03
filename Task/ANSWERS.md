@@ -7,7 +7,7 @@
 - [4. Provide a Proxy to a Webserver Claiming Port 443](#4-provide-a-proxy-to-a-webserver-claiming-port-443)
 
 **Network Task**
-- [Network Task - Company Topology Design](#network-task---company-topology-design)
+- [Company Topology Design](#company-topology-design)
 - [1. Provide Systematic Access for Other Users to the Machine](#1-provide-systematic-access-for-other-users-to-the-machine)
 - [2. Limit Access of Users to Specific Applications/Folders](#2-limit-access-of-users-to-specific-applicationsfolders)
 - [3. Prevent Application Starvation Between Users](#3-prevent-application-starvation-between-users)
@@ -265,7 +265,45 @@ This setup ensures a clean separation of proxy logic, can be easily deployed on 
 
 ---
 
-## Network Task - Company Topology Design
+# Network Task
+
+## Company Topology Design
+
+### Architectures
+
+**Collapsed-core architecture vs Three-Tier architecture**
+
+Collapsed-core architecture is essentially a simplified alternative to the traditional Three-Tier architecture in networking.
+
+### Quick comparison:
+
+#### ✅ **Three-Tier Architecture**
+1. **Core Layer** – High-speed backbone connecting distribution layers.
+2. **Distribution Layer** – Aggregates access layer switches; handles routing, policy, filtering.
+3. **Access Layer** – Connects end devices like PCs, printers, APs.
+
+- **Used in:** Large enterprise networks
+- **Pros:** Scalable, modular, fault-tolerant
+- **Cons:** More complex, more hardware
+
+#### ✅ **Collapsed-Core Architecture**
+- **Combines the Core and Distribution layers** into one layer.
+- You’re left with:
+  1. **Collapsed Core/Distribution Layer**
+  2. **Access Layer**
+
+- **Used in:** Small to medium-sized networks
+- **Pros:** Lower cost, simpler management, fewer devices
+- **Cons:** Less redundancy/scalability than Three-Tier
+
+---
+
+### When to use each?
+
+| Network Size | Architecture       | Why                         |
+|--------------|-------------------|-----------------------------|
+| Small/Medium | Collapsed-Core    | Cost-effective & simple     |
+| Large        | Three-Tier        | Scalability & performance   |
 
 ### Assumptions
 - Company Size: ~100 employees
@@ -275,26 +313,93 @@ This setup ensures a clean separation of proxy logic, can be easily deployed on 
 
 ### Topology Overview (Text-Based Markdown Format)
 
+#### Option 1: Three-Tiered Network Hierarchy
 ```markdown
-+------------------+       +------------------+
-|  Internet        |-------|  Firewall         |
-+--------+---------+       +--------+---------+
-                          | NAT, VPN, ACLs    |
-                          +--------+---------+
-                                   |
-                     +-------------+-------------+
-                     | VLAN Trunk via L3 Switch  |
-                     +--------------------------+
-                       |     |     |     |     |
-                    VLAN10 VLAN20 VLAN30 VLAN40 VLAN50
-                     Dev   Mgmt   Sales   HR     DMZ
+                                     +-------------------+
+                                     |     Internet      |
+                                     +--------+----------+
+                                              |
+                    +-------------------------+-------------------------+
+                    |        WAN Routers / Firewalls (2x)              |
+                    +-----------+-------------------------+------------+
+                                |                                   |
+              +----------------+------------+    +----------------+------------+
+              |       Core L3 Switch A       |    |       Core L3 Switch B       |
+              +-----------------------------+    +-----------------------------+
+                                |                                   |
+              +----------------+------------+    +----------------+------------+
+              |   Distribution Switch A     |    |   Distribution Switch B     |
+              +--------+--------+-----------+    +-----------+--------+--------+
+                       |        |                            |        |        |
+                   +--+--+   +--+--+                    +----+    +----+    +----+
+                   | SW1 |   | SW2 |                    | SW3 |    | SW4 |  | SW5 |
+                   +--+--+   +--+--+                    +--+--+    +--+--+  +--+--+
+                     |         |                          |         |       |
+                    Dev      Mgmt                      Sales       HR     DMZ/Wi-Fi
+```
 
-                    [VPN Access via Firewall for each VLAN]
+#### Option 2: Collapsed-Core Architecture
+```markdown
+                              +-------------------+
+                              |     Internet      |
+                              +--------+----------+
+                                       |
+                     +----------------+----------------+
+                     |  Firewall / VPN Gateway (HA)   |
+                     +--------+----------+------------+
+                              |          |
+                     +--------+--+   +---+--------+
+                     | L3 Switch A |   | L3 Switch B |
+                     +------------+   +------------+
+                         |   |             |   |
+                      +--+ +--+         +--+ +--+
+                      |AP| |SW|         |SW| |AP|
+                      +--+ +--+         +--+ +--+
+                       |    |           |    |
+                     WiFi Dev        Sales HR/DMZ
+```
 
-       - Each VLAN uses DHCP with static reservations for key devices
-       - Inter-VLAN routing only where necessary (e.g., Dev to DMZ)
-       - VLAN tagging handled at switch and AP level
-       - Wi-Fi SSIDs mapped to VLANs
+- Use Three-Tier for enterprise scalability, high performance, and full fault-tolerance
+- Use Collapsed-Core for cost-efficiency and simpler setup suitable for ~100-user companies
+- Both approaches support VLAN segmentation, secure VPN access, and DMZ exposure via a single public IP
+
+
+- Collapsed Core: Core and Distribution layers are combined for simplicity and cost-efficiency
+- Dual L3 switches ensure redundancy and inter-VLAN routing
+- Access switches and APs connect each department (Dev, Sales, HR, etc.)
+- VLANs per department; tagged traffic handled at L3 switch level
+- All zones access internet via central firewall/VPN gateway
+- DMZ hosts only selected public services, reverse-proxied via single public IP
+- VPN profiles grant segmented access per user role or zone
+```
+
+- Fully redundant WAN/firewall, core, and distribution layers
+- Access switches connect to workstations and Wi-Fi APs in respective zones
+- VLANs per zone: Dev, Mgmt, Sales, HR, DMZ, and Wi-Fi
+- Distribution switches handle inter-VLAN routing, traffic control, and QoS
+- Core layer aggregates traffic and connects to the firewall layer
+- Firewall manages NAT, ACLs, VPNs, and exposes DMZ with reverse proxy
+- A single public IP serves all external services via reverse proxy (e.g., NGINX)
+- VPN endpoint enables secure, segmented access per group
+```
+
+- Fully redundant WAN/firewall, core, and distribution layers
+- Access switches connect to workstations and Wi-Fi APs in respective zones
+- VLANs per zone: Dev, Mgmt, Sales, HR, DMZ, and Wi-Fi
+- Distribution switches handle inter-VLAN routing, traffic control, and QoS
+- Core layer aggregates traffic and connects to the firewall layer
+- Firewall manages NAT, ACLs, VPNs, and exposes DMZ with reverse proxy
+- A single public IP serves all external services via reverse proxy (e.g., NGINX)
+- VPN endpoint enables secure, segmented access per group
+```
+
+- Redundant firewalls ensure high availability.
+- Dual Core and Distribution layers provide fault tolerance.
+- Access switches connect workstations and APs for each department.
+- Each VLAN connects to its distribution switch and is tagged accordingly.
+- DMZ hosts externally reachable services behind a reverse proxy.
+- Single external IP maps to multiple services internally.
+- VPN terminates at firewall, providing segmented access to each VLAN.
 ```
 
 ### Network Hardware
@@ -341,10 +446,23 @@ server {
 - Access restricted to specific VLAN based on user role
 
 ### Cost and Time Estimate
-- **Hardware**: ~€10,000 (firewalls, switches, APs)
+
+**🟢 Cost-Effective Setup**
+- **Hardware**: ~€1,000–€1,300 total
+- **Initial Setup**: 1–2 weeks
+- **Ongoing Maintenance**: ~5 hrs/month
+
+**🔵 Higher-End Setup**
+- **Hardware**: ~€2,000–€2,500 total
 - **Initial Setup**: 2–3 weeks
 - **Ongoing Maintenance**: ~5 hrs/month
-- **Licensing**: Prefer open-source (pfSense, WireGuard, NGINX), optional RADIUS or SSO integration
+
+**🟣 High-End Enterprise Setup**
+- **Hardware**: ~€6,000–€8,000 total
+- **Initial Setup**: 3–4 weeks
+- **Ongoing Maintenance**: ~8–10 hrs/month
+
+**Licensing**: Prefer open-source stack (pfSense, WireGuard, NGINX). High-end may require commercial licenses (e.g., Cisco, Palo Alto, Meraki). Optional RADIUS or SSO integration for all tiers.
 
 # Summary
 
@@ -390,3 +508,6 @@ server {
 - Initial setup: 2–3 weeks
 - Monthly maintenance: ~5 hours
 - Preference for **open-source solutions** (license savings)
+
+
+
