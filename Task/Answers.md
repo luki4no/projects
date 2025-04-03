@@ -315,8 +315,6 @@ server {
 - Optimized for **security** (`ssl_ciphers`, `protocols`) and **performance**
 - Used proxy headers to retain client info
 
----
-
 ### 🕸️ Network Architecture Design
 - Designed **scalable network** for 100-employee org
 - VLANs: Dev, Mgmt, Sales, HR, DMZ (via L3 switch)
