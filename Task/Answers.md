@@ -15,6 +15,11 @@
 - [4. Provide a Proxy to a Webserver Claiming Port 443](#4-provide-a-proxy-to-a-webserver-claiming-port-443)
 - [Network Task - Company Topology Design](#network-task---company-topology-design)
 
+**Summary**
+
+- [Summary](#Summary)
+
+
 # General Linux Tasks
 
 ## 1. Provide Systematic Access for Other Users to the Machine
@@ -328,7 +333,3 @@ server {
 - Initial setup: 2–3 weeks
 - Monthly maintenance: ~5 hours
 - Preference for **open-source solutions** (license savings)
-
----
-
-Would you like me to append this summary directly into the markdown document as well?
