@@ -8,7 +8,6 @@
 
 **Network Task**
 - [Network Task - Company Topology Design](#network-task---company-topology-design)
-
 - [1. Provide Systematic Access for Other Users to the Machine](#1-provide-systematic-access-for-other-users-to-the-machine)
 - [2. Limit Access of Users to Specific Applications/Folders](#2-limit-access-of-users-to-specific-applicationsfolders)
 - [3. Prevent Application Starvation Between Users](#3-prevent-application-starvation-between-users)
