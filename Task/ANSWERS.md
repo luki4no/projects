@@ -277,8 +277,7 @@ This setup ensures a clean separation of proxy logic, can be easily deployed on 
 
 ```markdown
 +------------------+       +------------------+
-|  Internet        |-------|  Firewall (e.g.,  |
-|                  |       |  pfSense/OPNsense)|
+|  Internet        |-------|  Firewall         |
 +--------+---------+       +--------+---------+
                           | NAT, VPN, ACLs    |
                           +--------+---------+
