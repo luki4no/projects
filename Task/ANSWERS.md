@@ -295,9 +295,8 @@ server {
 - **Initial Setup**: 2–3 weeks
 - **Ongoing Maintenance**: ~5 hrs/month
 - **Licensing**: Prefer open-source (pfSense, WireGuard, NGINX), optional RADIUS or SSO integration
-```
 
-```
+
 # Summary
 
 ## 📝 Summary of Key Discussion Points
