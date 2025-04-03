@@ -9,12 +9,6 @@
 **Network Task**
 - [Company Topology Design](#company-topology-design)
 
-- [1. Provide Systematic Access for Other Users to the Machine](#1-provide-systematic-access-for-other-users-to-the-machine)
-- [2. Limit Access of Users to Specific Applications/Folders](#2-limit-access-of-users-to-specific-applicationsfolders)
-- [3. Prevent Application Starvation Between Users](#3-prevent-application-starvation-between-users)
-- [4. Provide a Proxy to a Webserver Claiming Port 443](#4-provide-a-proxy-to-a-webserver-claiming-port-443)
-- [Company Topology Design](#company-topology-design)
-
 # General Linux Tasks
 
 ## 1. Provide Systematic Access for Other Users to the Machine
